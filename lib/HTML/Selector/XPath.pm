@@ -215,7 +215,7 @@ sub to_xpath {
             } elsif ($1 =~ /^nth-of-type\((\d+)\)$/) {
                 push @parts, "[$1]";
             } elsif ($1 =~ /^contains\($/) {
-                $rule =~ s/^\s*"([^"]*)"\s*\)\s*$//
+                $rule =~ s/^\s*"([^"]*)"\s*\)//
                     or die "Malformed string in :contains(): '$rule'";
                 push @parts, qq{[text()[contains(string(.),"$1")]]};
             } elsif ( $1 eq 'root') {
