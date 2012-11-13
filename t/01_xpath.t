@@ -520,6 +520,17 @@ E:nth-child(2)
 
 ===
 --- selector
+E:nth-child(even)
+--- xpath
+//E[not((count(preceding-sibling::*)+1)<0) and ((count(preceding-sibling::*) + 1) - 0) mod 2 = 0 and parent::*]
+===
+--- selector
+E:nth-child(odd)
+--- xpath
+//E[not((count(preceding-sibling::*)+1)<1) and ((count(preceding-sibling::*) + 1) - 1) mod 2 = 0 and parent::*]
+
+===
+--- selector
 E:nth-child(2n)
 --- xpath
 //E[not((count(preceding-sibling::*)+1)<0) and ((count(preceding-sibling::*) + 1) - 0) mod 2 = 0 and parent::*]

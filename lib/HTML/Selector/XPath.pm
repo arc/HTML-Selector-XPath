@@ -194,6 +194,10 @@ sub to_xpath {
                 push @parts, nth_child(1), nth_last_child(1);
             } elsif ($1 =~ /^lang\(([\w\-]+)\)$/) {
                 push @parts, "[\@xml:lang='$1' or starts-with(\@xml:lang, '$1-')]";
+            } elsif ($1 =~ /^nth-child\(odd\)$/) {
+                push @parts, nth_child(2, 1);
+            } elsif ($1 =~ /^nth-child\(even\)$/) {
+                push @parts, nth_child(2, 0);
             } elsif ($1 =~ /^nth-child\((\d+)\)$/) {
                 push @parts, nth_child($1);
             } elsif ($1 =~ /^nth-child\((\d+)n(?:\+(\d+))?\)$/) {
