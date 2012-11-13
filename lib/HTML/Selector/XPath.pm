@@ -66,7 +66,7 @@ sub convert_attribute_match {
     } else { # exact match
         "\@$left='$^N'";
     }
-};
+}
 
 sub _generate_child {
     my ($direction,$a,$b) = @_;
@@ -78,24 +78,24 @@ sub _generate_child {
     } else { # -an + $b
         $a = -$a;
         return "[not((count($direction-sibling::*)+1)>$b) and (($b - (count($direction-sibling::*) + 1)) mod $a) = 0 and parent::*]"
-    };
-};
+    }
+}
 
 sub nth_child {
     my ($a,$b) = @_;
     if (@_ == 1) {
         ($a,$b) = (0,$a);
-    };
+    }
     _generate_child('preceding', $a, $b);
-};
+}
 
 sub nth_last_child {
     my ($a,$b) = @_;
     if (@_ == 1) {
         ($a,$b) = (0,$a);
-    };
+    }
     _generate_child('following', $a, $b);
-};
+}
 
 sub to_xpath {
     my $self = shift;
@@ -120,7 +120,7 @@ sub to_xpath {
         # (that is, if we start with a combinator)
         if ($rule =~ /$reg->{combinator}/) {
             $rule = "* $rule";
-        };
+        }
 
         # Match elements
         if ($rule =~ s/$reg->{element}//) {
@@ -140,15 +140,15 @@ sub to_xpath {
             
             if (! $wrote_tag++) {
                 push @parts, $tag;
-            };
+            }
 
             # XXX Shouldn't the RE allow both, ID and class?
             if ($id_class eq '#') { # ID
                 push @parts, "[\@id='$name']";
             } elsif ($id_class eq '.') { # class
                 push @parts, "[contains(concat(' ', \@class, ' '), ' $name ')]";
-            };
-        };
+            }
+        }
 
         # Match attribute selectors
         if ($rule =~ s/$reg->{attr2}//) {
@@ -157,7 +157,7 @@ sub to_xpath {
             # If we have no tag output yet, write the tag:
             if (! $wrote_tag++) {
                 push @parts, '*';
-            };
+            }
             push @parts, "[\@$1]";
         } elsif ($rule =~ $reg->{badattr}) {
             Carp::croak "Invalid attribute-value selector '$rule'";
