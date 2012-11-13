@@ -108,7 +108,6 @@ sub to_xpath {
     my @next_parts;
 
     my $wrote_tag;
-    my $tag_index;
     my $root_index = 0; # points to the current root
     # Loop through each "unit" of the rule
     while (length $rule && $rule ne $last_rule) {
@@ -141,7 +140,6 @@ sub to_xpath {
             
             if (! $wrote_tag++) {
                 push @parts, $tag;
-                $tag_index = $#parts;
             };
 
             # XXX Shouldn't the RE allow both, ID and class?
@@ -159,7 +157,6 @@ sub to_xpath {
             # If we have no tag output yet, write the tag:
             if (! $wrote_tag++) {
                 push @parts, '*';
-                $tag_index = $#parts;
             };
             push @parts, "[\@$1]";
         } elsif ($rule =~ $reg->{badattr}) {
@@ -230,7 +227,6 @@ sub to_xpath {
                 push @parts, "/";
             } elsif ($match =~ /\+/) {
                 push @parts, "/following-sibling::*[1]/self::";
-                $tag_index = $#parts;
             } elsif ($match =~ /\~/) {
                 push @parts, "/following-sibling::";
             } elsif ($match =~ /^\s*$/) {
