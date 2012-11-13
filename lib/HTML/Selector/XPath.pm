@@ -176,8 +176,6 @@ sub to_xpath {
                 my $xpath = selector_to_xpath($sub_rule);
                 $xpath =~ s!^//!!;
                 push @parts, "[not(self::$xpath)]";
-            #} else {
-            #    Carp::croak "Can't translate '$sub_rule' inside :not()";
             }
         }
 
