@@ -559,6 +559,11 @@ div *:not(p) em
 //div//*[not(self::p)]//em
 ===
 --- selector
+a:not(.external)[href]
+--- xpath
+//a[not(self::*[contains(concat(' ', @class, ' '), ' external ')])][@href]
+===
+--- selector
 div em:only-child
 --- xpath
 //div//em[count(preceding-sibling::*) = 0 and parent::*][count(following-sibling::*) = 0 and parent::*]
