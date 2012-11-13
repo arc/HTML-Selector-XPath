@@ -18,24 +18,26 @@ sub selector_to_xpath {
 # escaped characters.
 my $ident = qr/(?![0-9]|-[-0-9])[-_a-zA-Z0-9]+/;
 
-my $reg = {
-    # tag name/id/class
-    element => qr/^([#.]?)([a-z0-9\\*_-]*)((\|)([a-z0-9\\*_-]*))?/i,
-    # attribute presence
-    attr1   => qr/^\[ \s* ($ident) \s* \]/x,
-    # attribute value match
-    attr2   => qr/^\[ \s* ($ident) \s*
-        ( [~|*^\$!]? = ) \s*
-        (?: ($ident) | "([^"]*)" | '([^']*)') \s* \] /x,
-    badattr => qr/^\[/,
-    attrN   => qr/^:not\(\s*(.*?)\)/i, # this should be a parentheses matcher instead of a RE!
-    pseudo  => qr/^:([()a-z0-9_+-]+)/i,
-    # adjacency/direct descendance
-    combinator => qr/^(\s*[>+~\s](?!,))/i,
-    # rule separator
-    comma => qr/^\s*,\s*/i,
-};
+# tag name/id/class
+my $element_rx = qr/^([#.]?)([a-z0-9\\*_-]*)((\|)([a-z0-9\\*_-]*))?/i;
 
+# attribute presence
+my $attr1_rx = qr/^\[ \s* ($ident) \s* \]/x;
+
+# attribute value match
+my $attr2_rx = qr/^\[ \s* ($ident) \s*
+        ( [~|*^\$!]? = ) \s*
+        (?: ($ident) | "([^"]*)" | '([^']*)') \s* \] /x;
+my $badattr_rx = qr/^\[/;
+my $not_rx = qr/^:not\(\s*(.*?)\)/i; # this should be a parentheses matcher instead of a RE!
+
+my $pseudo_rx = qr/^:([()a-z0-9_+-]+)/i;
+
+# adjacency/direct descendance
+my $combinator_rx = qr/^(\s*[>+~\s](?!,))/i;
+
+# rule separator
+my $comma_rx = qr/^\s*,\s*/i;
 
 sub new {
     my($class, $exp) = @_;
@@ -118,12 +120,12 @@ sub to_xpath {
 
         # Prepend explicit first selector if we have an implicit selector
         # (that is, if we start with a combinator)
-        if ($rule =~ /$reg->{combinator}/) {
+        if ($rule =~ $combinator_rx) {
             $rule = "* $rule";
         }
 
         # Match elements
-        if ($rule =~ s/$reg->{element}//) {
+        if ($rule =~ s/$element_rx//) {
             my ($id_class,$name,$lang) = ($1,$2,$3);
 
             # to add *[1]/self:: for follow-sibling
@@ -151,26 +153,26 @@ sub to_xpath {
         }
 
         # Match attribute selectors
-        if ($rule =~ s/$reg->{attr2}//) {
+        if ($rule =~ s/$attr2_rx//) {
             push @parts, "[", convert_attribute_match( $1, $2, $^N ), "]";
-        } elsif ($rule =~ s/$reg->{attr1}//) {
+        } elsif ($rule =~ s/$attr1_rx//) {
             # If we have no tag output yet, write the tag:
             if (! $wrote_tag++) {
                 push @parts, '*';
             }
             push @parts, "[\@$1]";
-        } elsif ($rule =~ $reg->{badattr}) {
+        } elsif ($rule =~ $badattr_rx) {
             Carp::croak "Invalid attribute-value selector '$rule'";
         }
 
         # Match negation
-        if ($rule =~ s/$reg->{attrN}//) {
+        if ($rule =~ s/$not_rx//) {
             my $sub_rule = $1;
-            if ($sub_rule =~ s/$reg->{attr2}//) {
+            if ($sub_rule =~ s/$attr2_rx//) {
                 push @parts, "[not(", convert_attribute_match( $1, $2, $^N ), ")]";
-            } elsif ($sub_rule =~ s/$reg->{attr1}//) {
+            } elsif ($sub_rule =~ s/$attr1_rx//) {
                 push @parts, "[not(\@$1)]";
-            } elsif ($sub_rule =~ $reg->{badattr}) {
+            } elsif ($sub_rule =~ $badattr_rx) {
                 Carp::croak "Invalid negated attribute-value selector ':not($sub_rule)'";
             } else {
                 my $xpath = selector_to_xpath($sub_rule);
@@ -180,7 +182,7 @@ sub to_xpath {
         }
 
         # Ignore pseudoclasses/pseudoelements
-        while ($rule =~ s/$reg->{pseudo}//) {
+        while ($rule =~ s/$pseudo_rx//) {
             if ( my @expr = $self->parse_pseudo($1, \$rule) ) {
                 push @parts, @expr;
             } elsif ( $1 eq 'first-child') {
@@ -219,7 +221,7 @@ sub to_xpath {
         }
 
         # Match combinators (whitespace, >, + and ~)
-        if ($rule =~ s/$reg->{combinator}//) {
+        if ($rule =~ s/$combinator_rx//) {
             my $match = $1;
             if ($match =~ />/) {
                 push @parts, "/";
@@ -238,7 +240,7 @@ sub to_xpath {
         }
 
         # Match commas
-        if ($rule =~ s/$reg->{comma}//) {
+        if ($rule =~ s/$comma_rx//) {
             push @parts, " | ", "$root/"; # ending one rule and beginning another
             $root_index = $#parts;
             undef $wrote_tag;
