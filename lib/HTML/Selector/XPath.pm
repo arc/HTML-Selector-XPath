@@ -107,7 +107,6 @@ sub to_xpath {
     my $last_rule = '';
     my @next_parts;
 
-    my $tag;
     my $wrote_tag;
     my $tag_index;
     my $root_index = 0; # points to the current root
@@ -134,11 +133,7 @@ sub to_xpath {
                 @next_parts = ();
             }
 
-            if ($id_class eq '') {
-                $tag = $name || '*';
-            } else {
-                $tag = '*';
-            }
+            my $tag = $id_class eq '' ? $name || '*' : '*';
             
             if (defined $parms{prefix} and not $tag =~ /[*:|]/) {
                 $tag = join ':', $parms{prefix}, $tag;
@@ -245,7 +240,6 @@ sub to_xpath {
             }
 
             # new context
-            undef $tag;
             undef $wrote_tag;
         }
 
@@ -253,7 +247,6 @@ sub to_xpath {
         if ($rule =~ s/$reg->{comma}//) {
             push @parts, " | ", "$root/"; # ending one rule and beginning another
             $root_index = $#parts;
-            undef $tag;
             undef $wrote_tag;
         }
     }
