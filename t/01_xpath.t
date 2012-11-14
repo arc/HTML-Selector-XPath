@@ -173,13 +173,13 @@ E:not([foo^=warning])
 --- selector
 E[foo$="warning"]
 --- xpath
-//E[ends-with(@foo,'warning')]
+//E[substring(@foo,string-length(@foo)-6)='warning']
 
 ===
 --- selector
 E[foo$=warning]
 --- xpath
-//E[ends-with(@foo,'warning')]
+//E[substring(@foo,string-length(@foo)-6)='warning']
 
 ===
 --- selector

@@ -64,7 +64,8 @@ sub convert_attribute_match {
     } elsif ($op eq '^=') {
         "starts-with(\@$left,'$^N')";
     } elsif ($op eq '$=') {
-        "ends-with(\@$left,'$^N')";
+        my $n = length($^N) - 1;
+        "substring(\@$left,string-length(\@$left)-$n)='$^N'";
     } else { # exact match
         "\@$left='$^N'";
     }
