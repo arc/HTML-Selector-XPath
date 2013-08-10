@@ -19,22 +19,13 @@ my @should_die = split /\n+/, <<'EOF';
 [x=abc z]
 EOF
 
-plan tests => 2 * blocks() + @should_die;
+plan tests => 1 * blocks() + @should_die;
 filters { selector => 'chomp', xpath => 'chomp' };
 
 run {
     my $block = shift;
     my $selector = HTML::Selector::XPath->new($block->selector);
     is $selector->to_xpath, $block->xpath, $block->selector;
-    
-    # This test checks that any selector is allowed in the middle of
-    # another expression
-    $selector = HTML::Selector::XPath->new($block->selector . " C");
-    is $selector->to_xpath, $block->xpath."//C", $block->selector . " trailed by expression";
-    
-    # Some of these make no sense
-    #$selector = HTML::Selector::XPath->new(" C " . $block->selector);
-    #is $selector->to_xpath, "//C" . $block->xpath, $block->selector . " lead by expression";
 };
 
 for my $selector (@should_die) {
