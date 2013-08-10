@@ -10,5 +10,6 @@
 \.gz$
 \.cvsignore
 \.git
+\.releaserc
 \.shipit
 ^MYMETA\..*
