@@ -153,7 +153,7 @@ sub to_xpath {
             if ($id_class eq '#') { # ID
                 push @parts, "[\@id='$name']";
             } elsif ($id_class eq '.') { # class
-                push @parts, "[contains(concat(' ', \@class, ' '), ' $name ')]";
+                push @parts, "[contains(concat(' ', normalize-space(\@class), ' '), ' $name ')]";
             };
         };
 
