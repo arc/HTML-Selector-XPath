@@ -1,6 +1,7 @@
 use strict;
 use Test::Base;
 use HTML::Selector::XPath;
+use Encode qw(decode);
 
 eval { require HTML::TreeBuilder::XPath };
 plan skip_all => "HTML::TreeBuilder::XPath is not installed." if $@;
@@ -8,21 +9,30 @@ plan skip_all => "HTML::TreeBuilder::XPath is not installed." if $@;
 filters { selector => 'chomp', expected => [ 'lines', 'array' ] };
 plan tests => 1 * blocks;
 
+binmode STDOUT, ':encoding(UTF-8)'; # because our test names contain UTF-8
+binmode STDERR, ':encoding(UTF-8)'; # because our test names contain UTF-8
+# But it seems that Test::More or Test::Base or whoever mess with STDOUT/STDERR
+# on their own.
+
 run {
     my $block = shift;
     my $tree = HTML::TreeBuilder::XPath->new;
-    $tree->parse($block->input);
+    my $input= decode( 'UTF-8', $block->input);
+    $tree->parse($input);
     $tree->eof;
 
+    my $sel= decode( 'UTF-8', scalar $block->selector );
     my $expr;
     if ($block->selector =~ m!^/!) {
-        $expr = $block->selector;
+        $expr = $sel;
     } else {
-        $expr = HTML::Selector::XPath->new($block->selector)->to_xpath
+        $expr = HTML::Selector::XPath->new($sel)->to_xpath
     };
     my @nodes = $tree->findnodes( $expr );
-    is_deeply [ map $_->as_XML, @nodes ], $block->expected,
-        $block->selector . " -> $expr";
+    my $expected= [ map { decode( 'UTF-8', $_ )} @{ $block->expected } ];
+    my $got= [ map $_->as_XML, @nodes ];
+    is_deeply $got, $expected,
+        $sel . " -> $expr";
 }
 
 __END__
