@@ -1,7 +1,8 @@
 Revision history for Perl extension HTML::Selector::XPath
 
-0.18 NEXT
-      - Fix bug in `:not(...)[attr] (Aaron Crane)
+0.19 NEXT
+
+0.18 Sat Aug 30 16:32:35 2014      - Fix bug in `:not(...)[attr] (Aaron Crane)
       - Support `:nth-child(odd)` and `:nth-child(even)` (Aaron Crane)
       - Translation of `[attr$=tail]` works with XPath 1.0 (Aaron Crane)
 
