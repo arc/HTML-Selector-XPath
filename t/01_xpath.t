@@ -128,13 +128,13 @@ E[foo="warning"]
 --- selector
 E[foo~="warning"]
 --- xpath
-//E[contains(concat(' ', @foo, ' '), ' warning ')]
+//E[contains(concat(' ', normalize-space(@foo), ' '), ' warning ')]
 
 ===
 --- selector
 E[foo~=warning]
 --- xpath
-//E[contains(concat(' ', @foo, ' '), ' warning ')]
+//E[contains(concat(' ', normalize-space(@foo), ' '), ' warning ')]
 
 ===
 --- selector

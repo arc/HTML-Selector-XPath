@@ -53,7 +53,7 @@ sub convert_attribute_match {
     if ($op eq '!=') {
         "\@$left!='$right'";
     } elsif ($op eq '~=') { # substring attribute match
-        "contains(concat(' ', \@$left, ' '), ' $right ')";
+        "contains(concat(' ', normalize-space(\@$left), ' '), ' $right ')";
     } elsif ($op eq '*=') { # real substring attribute match
         "contains(\@$left, '$right')";
     } elsif ($op eq '|=') {
